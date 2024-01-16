@@ -62,8 +62,26 @@ static void MX_TIM1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int pos = 0;
+char temp[10];
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
 
+  if(GPIO_Pin == GPIO_PIN_9) {
+    pos = 0;
+    sprintf(temp, "%d", pos);
+    SSD1306_Clear();
+	SSD1306_GotoXY (0,0);
+    SSD1306_Puts (temp, &Font_7x10, 1);
+    SSD1306_UpdateScreen();
+
+  } else{
+
+    __NOP();
+
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -100,9 +118,9 @@ int main(void)
   SSD1306_Init();
 
   HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
-  char temp[]="chdeeel";
+
   /* USER CODE END 2 */
-  int pos=0;
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -350,6 +368,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PC9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 }
 
